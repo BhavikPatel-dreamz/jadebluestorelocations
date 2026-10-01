@@ -1,4 +1,8 @@
-const APEX = "jadeblue.com";
+const APEXES = ["dddemo.net", "jadeblue.com"];
+
+function apexOf(hostname: string) {
+  return APEXES.find((apex) => hostname === apex || hostname.endsWith(`.${apex}`)) ?? null;
+}
 
 export function rootDomain(host: string) {
   const [hostname, port] = host.toLowerCase().split(":");
@@ -6,7 +10,8 @@ export function rootDomain(host: string) {
   if (hostname === "localhost" || hostname.endsWith(".localhost")) {
     return `localhost${suffix}`;
   }
-  return `${APEX}${suffix}`;
+  const apex = apexOf(hostname);
+  return `${apex ?? APEXES[0]}${suffix}`;
 }
 
 export function storeUrl(subdomain: string, host: string) {
@@ -25,22 +30,18 @@ export function listingUrl(host: string) {
 /** One store label, or null when this host is the listing (or not ours). */
 export function storeLabel(host: string) {
   const hostname = host.toLowerCase().split(":")[0];
-  if (
-    hostname === "localhost" ||
-    hostname === "stores.localhost" ||
-    hostname === `stores.${APEX}` ||
-    hostname === APEX ||
-    hostname === `www.${APEX}`
-  ) {
-    return null;
-  }
+  if (hostname === "localhost" || hostname === "stores.localhost") return null;
   if (hostname.endsWith(".localhost")) {
     const label = hostname.slice(0, -".localhost".length);
     return label.includes(".") ? null : label;
   }
-  if (hostname.endsWith(`.${APEX}`)) {
-    const label = hostname.slice(0, -(`.${APEX}`.length));
-    return label.includes(".") ? null : label;
+
+  const apex = apexOf(hostname);
+  if (!apex) return null;
+  if (hostname === apex || hostname === `www.${apex}` || hostname === `stores.${apex}`) {
+    return null;
   }
-  return null;
+  const label = hostname.slice(0, -(apex.length + 1));
+  if (!label || label.includes(".")) return null;
+  return label;
 }
