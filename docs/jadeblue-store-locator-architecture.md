@@ -8,8 +8,8 @@ Depends on: `docs/jadeblue-store-locator-audit.md`.
 
 | Topic | Decision |
 | --- | --- |
-| Source of truth | Application Postgres database. Shopify stays the commerce site on `jadeblue.com` and is not a second copy of locator rows. |
-| ORM | Drizzle ORM with `postgres` (node-postgres or `postgres.js`). No ORM exists today; Drizzle stays in TypeScript next to the schema. |
+| Source of truth | JSON file in this app (`data/stores.json`), copied from the live Shopify file `FINAL.json`. No database. Shopify stays the commerce site. |
+| ORM | None. Dropped after the request to keep locations in JSON. |
 | Admin | New admin under this app, because none exists. Session auth before any store mutation. Public pages do not require auth. |
 | Routing | Next.js 16 `proxy.ts` rewrites by hostname. Pages load the store on the server. |
 | Hosting assumption | One Next.js deployment (Vercel when a project exists). Apex DNS stays on Shopify. |
