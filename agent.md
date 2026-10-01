@@ -2,34 +2,35 @@
 
 ## Current task
 
-Task 1 — Existing application audit. Complete.
+Task 2 — Architecture and data model plan. Complete as a document. Not implemented.
 
 ## Status
 
-Audit documented. Implementation has not started. Waiting for approval before Task 2.
+Waiting for approval of `docs/jadeblue-store-locator-architecture.md` before Task 3.
 
 ## Completed work
 
-- Read `AGENTS.md` (Next.js 16 agent notice). There was no `agent.md` before this task; this file is the progress log requested for the store locator.
-- Inspected the Next.js app, routing, data layer, auth, APIs, and domain/deployment files.
-- Confirmed there is no store data, Shopify client, database, or hostname routing in this repository.
-- Wrote `docs/jadeblue-store-locator-audit.md`.
+- Task 1 audit of the Next.js 16 template app.
+- Task 2 plan: Postgres + Drizzle as the locator source of truth, `proxy.ts` hostname rewrites, public vs admin fields, cache tags, SEO, and DNS responsibilities.
 
 ## Files created or modified
 
-- `docs/jadeblue-store-locator-audit.md` (created)
-- `agent.md` (created)
+- `docs/jadeblue-store-locator-audit.md` (Task 1)
+- `docs/jadeblue-store-locator-architecture.md` (Task 2)
+- `agent.md`
 
 ## Architecture decisions
 
-- This app is Next.js 16.3.7 App Router. Hostname handling should use root `proxy.ts` (middleware is deprecated in this version), then a server-rendered page loads the store. Not implemented yet.
-- No store table exists. A single stores model should be added later rather than duplicating one.
-- Shopify `jadeblue.com` stays the commerce site. This app should own locator content once a database is chosen. Do not treat that as a source-of-truth change already made; no data was migrated.
-- Do not point apex `jadeblue.com` at this app.
+- Locator data lives in one `stores` table in app Postgres. Shopify remains commerce on `jadeblue.com` and is not synced in this phase.
+- ORM: Drizzle. Not installed yet.
+- Routing: `proxy.ts` rewrites `stores.jadeblue.com` to `/stores` and `{label}.jadeblue.com` to `/s/{label}`. The page loads the row and 404s when missing or inactive. Proxy does not query the database.
+- `store_name`, `store_slug`, `subdomain`, `city`, and address stay distinct. Subdomain is unique. Reserved labels cannot be stores.
+- Cache tags: `store:<subdomain>` and `stores:index`.
+- No production DNS or Shopify changes in the plan.
 
 ## Tests performed
 
-None. This task was read-only inspection plus documentation. No runtime behavior was exercised as a feature test because no locator exists.
+None. Planning only. No schema, routes, or records were added.
 
 ## Test results
 
@@ -37,14 +38,13 @@ Not applicable.
 
 ## Known issues
 
-- The app is still the Create Next App template.
-- No git remote, no Vercel (or other) project, no database, no admin auth, no map provider.
-- Live Shopify locator content was not inspected via Admin API.
+- App is still the Create Next App template.
+- No `DATABASE_URL`, auth, object storage, map key, or hosting project.
+- Shopify Admin locations were not verified.
 
 ## Pending tasks
 
-- Task 2 — Architecture and data model plan (`docs/jadeblue-store-locator-architecture.md`)
-- Task 3 — Store data management
+- Task 3 — Store data management (schema, validation, admin)
 - Task 4 — Subdomain routing
 - Task 5 — Store listing page
 - Task 6 — Store detail page
@@ -54,4 +54,4 @@ Not applicable.
 
 ## Next recommended task
 
-Task 2, after approval of this audit.
+Task 3 after this architecture is approved.
